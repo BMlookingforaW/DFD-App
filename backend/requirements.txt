@@ -1,0 +1,9 @@
+Flask
+flask-cors
+numpy
+opencv-python
+Pillow
+tensorflow
+keras>=2.2.0
+mtcnn
+h5py

@@ -1,0 +1,30 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+env/
+tf-env/
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploaded files
+uploads/
+*.log
+
+# Model weights / large files
+*.h5
+*.ckpt
+
+# Editor settings
+.vscode/
+.idea/
+
+# Render & Flask config
+instance/
+.env
