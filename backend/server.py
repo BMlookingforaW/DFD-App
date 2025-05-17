@@ -9,6 +9,8 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from mtcnn import MTCNN
 
+print("📦 Starting Flask app...")
+
 app = Flask(__name__)
 CORS(app)
 
