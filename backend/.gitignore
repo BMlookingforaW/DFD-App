@@ -14,11 +14,9 @@ tf-env/
 Thumbs.db
 
 # Uploaded files
-uploads/
 *.log
 
 # Model weights / large files
-*.h5
 *.ckpt
 
 # Editor settings
