@@ -42,7 +42,7 @@ const UploadComponent = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post<ResultType>("http://127.0.0.1:5000/api/detect", formData);
+      const res = await axios.post("https://dfd-app.onrender.com/api/detect", formData);
       setResult(res.data);
     } catch (error) {
       console.error("Upload failed:", error);
