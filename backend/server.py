@@ -9,6 +9,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from mtcnn import MTCNN
 import shutil
+import random
 
 print("📦 Starting Flask app...")
 
@@ -45,55 +46,76 @@ def download_model_if_missing():
 @app.route("/")
 def home():
     return "✅ DeepFake Detection API is running"
+
+
+
 @app.route("/api/detect", methods=["POST"])
-def detect():
-    global model
+def dummy_detect():
+    print("📥 Dummy /api/detect hit")
 
-    print("🔁 /api/detect hit")
+    # Simulate processing delay
+    import time
+    time.sleep(1)
 
-    if not os.path.exists(MODEL_PATH):
-        print("⬇️ Downloading model...")
-        download_model_if_missing()
+    prediction = random.choice(["Real", "Fake"])
+    confidence = round(random.uniform(60.0, 99.9), 2)
 
-    if model is None:
-        print("🧠 Loading model...")
-        model = load_model(MODEL_PATH)
-        print("✅ Model loaded")
+    print(f"🧪 Dummy prediction: {prediction} ({confidence}%)")
+    return jsonify({
+        "prediction": prediction,
+        "confidence": confidence,
+        "note": "This is a dummy prediction"
+    })
 
-    uploaded_file = request.files.get("file")
-    if not uploaded_file:
-        print("🚫 No file uploaded")
-        return jsonify({"error": "No file uploaded"}), 400
+# @app.route("/api/detect", methods=["POST"])
+# def detect():
+#     global model
 
-    try:
-        print(f"📥 Received file: {uploaded_file.filename}")
-        file_path = os.path.join("uploads", uploaded_file.filename)
-        uploaded_file.save(file_path)
-        print("📸 File saved")
+#     print("🔁 /api/detect hit")
 
-        img = cv2.imread(file_path)
-        results = face_detector.detect_faces(img)
-        print("🧠 Face detection complete")
+#     if not os.path.exists(MODEL_PATH):
+#         print("⬇️ Downloading model...")
+#         download_model_if_missing()
 
-        if results:
-            x, y, w, h = results[0]['box']
-            face = img[y:y+h, x:x+w]
-        else:
-            face = cv2.resize(img, (128, 128))
+#     if model is None:
+#         print("🧠 Loading model...")
+#         model = load_model(MODEL_PATH)
+#         print("✅ Model loaded")
 
-        face = cv2.resize(face, (128, 128))
-        input_tensor = np.expand_dims(img_to_array(face) / 255.0, axis=0)
+#     uploaded_file = request.files.get("file")
+#     if not uploaded_file:
+#         print("🚫 No file uploaded")
+#         return jsonify({"error": "No file uploaded"}), 400
 
-        prediction = model.predict(input_tensor)[0][0]
-        confidence = round(float(prediction * 100 if prediction > 0.5 else (1 - prediction) * 100), 2)
-        label = "Fake" if prediction > 0.5 else "Real"
+#     try:
+#         print(f"📥 Received file: {uploaded_file.filename}")
+#         file_path = os.path.join("uploads", uploaded_file.filename)
+#         uploaded_file.save(file_path)
+#         print("📸 File saved")
 
-        print(f"✅ Prediction: {label}, Confidence: {confidence}")
-        return jsonify({"prediction": label, "confidence": confidence})
+#         img = cv2.imread(file_path)
+#         results = face_detector.detect_faces(img)
+#         print("🧠 Face detection complete")
 
-    except Exception as e:
-        print("❌ Error during detection:", str(e))
-        return jsonify({"error": "Server error", "detail": str(e)}), 500
+#         if results:
+#             x, y, w, h = results[0]['box']
+#             face = img[y:y+h, x:x+w]
+#         else:
+#             face = cv2.resize(img, (128, 128))
+
+#         face = cv2.resize(face, (128, 128))
+#         input_tensor = np.expand_dims(img_to_array(face) / 255.0, axis=0)
+
+#         prediction = model.predict(input_tensor)[0][0]
+#         confidence = round(float(prediction * 100 if prediction > 0.5 else (1 - prediction) * 100), 2)
+#         label = "Fake" if prediction > 0.5 else "Real"
+
+#         print(f"✅ Prediction: {label}, Confidence: {confidence}")
+#         return jsonify({"prediction": label, "confidence": confidence})
+
+#     except Exception as e:
+#         print("❌ Error during detection:", str(e))
+#         return jsonify({"error": "Server error", "detail": str(e)}), 500
 
 
 @app.route("/ping")
