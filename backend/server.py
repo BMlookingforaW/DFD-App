@@ -49,40 +49,52 @@ def home():
 def detect():
     global model
 
-    # Lazy download
+    print("🔁 /api/detect hit")
+
     if not os.path.exists(MODEL_PATH):
+        print("⬇️ Downloading model...")
         download_model_if_missing()
 
-    # Lazy load
     if model is None:
         print("🧠 Loading model...")
         model = load_model(MODEL_PATH)
         print("✅ Model loaded")
 
-    # Process uploaded image
     uploaded_file = request.files.get("file")
     if not uploaded_file:
+        print("🚫 No file uploaded")
         return jsonify({"error": "No file uploaded"}), 400
 
-    file_path = os.path.join("uploads", uploaded_file.filename)
-    uploaded_file.save(file_path)
+    try:
+        print(f"📥 Received file: {uploaded_file.filename}")
+        file_path = os.path.join("uploads", uploaded_file.filename)
+        uploaded_file.save(file_path)
+        print("📸 File saved")
 
-    img = cv2.imread(file_path)
-    results = face_detector.detect_faces(img)
-    if results:
-        x, y, w, h = results[0]['box']
-        face = img[y:y+h, x:x+w]
-    else:
-        face = cv2.resize(img, (128, 128))
+        img = cv2.imread(file_path)
+        results = face_detector.detect_faces(img)
+        print("🧠 Face detection complete")
 
-    face = cv2.resize(face, (128, 128))
-    input_tensor = np.expand_dims(img_to_array(face) / 255.0, axis=0)
+        if results:
+            x, y, w, h = results[0]['box']
+            face = img[y:y+h, x:x+w]
+        else:
+            face = cv2.resize(img, (128, 128))
 
-    prediction = model.predict(input_tensor)[0][0]
-    confidence = round(float(prediction * 100 if prediction > 0.5 else (1 - prediction) * 100), 2)
-    label = "Fake" if prediction > 0.5 else "Real"
+        face = cv2.resize(face, (128, 128))
+        input_tensor = np.expand_dims(img_to_array(face) / 255.0, axis=0)
 
-    return jsonify({"prediction": label, "confidence": confidence})
+        prediction = model.predict(input_tensor)[0][0]
+        confidence = round(float(prediction * 100 if prediction > 0.5 else (1 - prediction) * 100), 2)
+        label = "Fake" if prediction > 0.5 else "Real"
+
+        print(f"✅ Prediction: {label}, Confidence: {confidence}")
+        return jsonify({"prediction": label, "confidence": confidence})
+
+    except Exception as e:
+        print("❌ Error during detection:", str(e))
+        return jsonify({"error": "Server error", "detail": str(e)}), 500
+
 
 @app.route("/ping")
 def ping():
