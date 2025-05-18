@@ -8,6 +8,7 @@ from PIL import Image, UnidentifiedImageError
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from mtcnn import MTCNN
+import shutil
 
 print("📦 Starting Flask app...")
 
