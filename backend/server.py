@@ -42,6 +42,9 @@ def download_model_if_missing():
         print("❌ Model download failed:", e)
         raise
 
+@app.route("/")
+def home():
+    return "✅ DeepFake Detection API is running"
 @app.route("/api/detect", methods=["POST"])
 def detect():
     global model
